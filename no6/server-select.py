@@ -106,8 +106,14 @@ try:
                         sock.sendall(response_header.encode('utf-8') + response_data)
                         
                     else:
-                        sock.sendall(b'HTTP/1.1 404 Not found\r\n\r\n')
-
+                        f = open('404.html', 'r')
+                        response_data = f.read()
+                        f.close()
+                        
+                        content_length = len(response_data)
+                        response_header = 'HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Length:' \
+                                        + str(content_length) + '\r\n\r\n'
+                                        
 except KeyboardInterrupt:        
     server_socket.close()
     sys.exit(0)
