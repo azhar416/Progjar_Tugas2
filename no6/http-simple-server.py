@@ -1,3 +1,4 @@
+from distutils import extension
 import socket
 import select
 import sys
@@ -84,8 +85,23 @@ try:
                         response_data = f.read()
                         f.close()
 
+                        # f = open("/ext2mime.txt")
+                        filename = request_file.split('.')[0].strip('/')
+                        print("filename : ", filename)
+                        extension = request_file.split('.')[1]
+                        extension = '.' + extension
+                        content_type = ''
+                        print("extension : ", extension)
+                        with open('ext2mime.txt') as topo_file:
+                            for line in topo_file:
+                                ext = line.split(' ')[0]
+                                if extension == ext:
+                                    content_type = line.split(' ')[1]
+                                    break
+                                # print(line)  # The comma to suppress the extra new line char
+
                         content_length = len(response_data)
-                        response_header = 'HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Length:' \
+                        response_header = f'HTTP/1.1 200 OK\r\nContent-Disposition: attachment; filename="{filename}.{extension}"\r\nContent-Type: {content_type}; charset=UTF-8\r\nContent-Length:' \
                                             + str(content_length) + '\r\n\r\n'
                         sock.sendall(response_header.encode('utf-8') + response_data)
                         
