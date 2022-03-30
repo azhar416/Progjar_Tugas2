@@ -103,7 +103,7 @@ try:
                                 # print(line)  # The comma to suppress the extra new line char
 
                         content_length = len(response_data)
-                        response_header = f'HTTP/1.1 200 OK\r\nContent-Disposition: attachment; filename="{filename}.{extension}"\r\nContent-Type: {content_type}; charset=UTF-8\r\nContent-Length:' \
+                        response_header = f'HTTP/1.1 200 OK\r\nContent-Disposition: attachment; filename="{filename}{extension}"\r\nContent-Type: {content_type}; charset=UTF-8\r\nContent-Length:' \
                                             + str(content_length) + '\r\n\r\n'
                         sock.sendall(response_header.encode('utf-8') + response_data)
                         
