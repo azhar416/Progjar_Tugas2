@@ -1,10 +1,11 @@
 from distutils import extension
+from urllib.parse import unquote
 import socket
 import select
 import sys
 import os
 
-server_address = ('127.0.0.1', 80)
+server_address = ('127.0.0.1', 8000)
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 server_socket.bind(server_address)
@@ -12,7 +13,7 @@ server_socket.listen(5)
 
 input_socket = [server_socket]
 
-DATASET = './dataset'
+DATASET = 'no6/dataset'
 def listFiles():
     files = next(os.walk(DATASET), (None, None, []))[2]
     message = ""
@@ -44,7 +45,7 @@ try:
                 response_data = b''
                 
                 if request_file == 'index.html' or request_file == '/' or request_file == '/index.html':
-                    f = open('index.html', 'r')
+                    f = open('no6/index.html', 'r')
                     response_data = f.read()
                     f.close()
                     
@@ -55,7 +56,7 @@ try:
                     sock.sendall(response_header.encode('utf-8') + response_data.encode('utf-8'))
 
                 elif (request_file == '/dataset' or request_file == 'dataset'):
-                    # print('WOKE!');
+                    print('WOKE!')
                     response_data = """<!DOCTYPE html>
                     <html lang="en">
                     <head>
@@ -79,6 +80,7 @@ try:
                     sock.sendall(response_header.encode('utf-8') + response_data.encode('utf-8'))
 
                 else:
+                    request_file = unquote(request_file)
                     if (os.path.isfile(DATASET+request_file)):
                         # print('WOKEE!')
                         f = open(DATASET+request_file, 'rb')
@@ -92,7 +94,7 @@ try:
                         extension = '.' + extension
                         content_type = ''
                         print("extension : ", extension)
-                        with open('ext2mime.txt') as topo_file:
+                        with open('no6/ext2mime.txt') as topo_file:
                             for line in topo_file:
                                 ext = line.split(' ')[0]
                                 if extension == ext:
@@ -106,7 +108,7 @@ try:
                         sock.sendall(response_header.encode('utf-8') + response_data)
                         
                     else:
-                        f = open('404.html', 'r')
+                        f = open('no6/404.html', 'r')
                         response_data = f.read()
                         f.close()
                         
