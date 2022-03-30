@@ -1,11 +1,15 @@
-from distutils import extension
 from urllib.parse import unquote
 import socket
+import configparser
 import select
 import sys
 import os
 
-server_address = ('127.0.0.1', 8000)
+config = configparser.RawConfigParser()
+cfg_path = 'no6/httpserver.conf'
+config.read(cfg_path)
+
+server_address = (config.get('server-config', 'server'), int(config.get('server-config', 'port')))
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 server_socket.bind(server_address)
@@ -20,6 +24,13 @@ def listFiles():
     for idx, f in enumerate(files):
         message += f"<li><h5><a href='/{f}'>{f}</a></h3></li>\n"
     return message
+
+def getContentType(extension):
+  with open('no6/ext2mime.txt') as topo_file:
+    for line in topo_file:
+        ext = line.split(' ')[0]
+        if extension == ext:
+            return line.split(' ')[1]
 
 try:
     while True:
@@ -92,14 +103,8 @@ try:
                         print("filename : ", filename)
                         extension = request_file.split('.')[1]
                         extension = '.' + extension
-                        content_type = ''
                         print("extension : ", extension)
-                        with open('no6/ext2mime.txt') as topo_file:
-                            for line in topo_file:
-                                ext = line.split(' ')[0]
-                                if extension == ext:
-                                    content_type = line.split(' ')[1]
-                                    break
+                        content_type = getContentType(extension)
                                 # print(line)  # The comma to suppress the extra new line char
 
                         content_length = len(response_data)

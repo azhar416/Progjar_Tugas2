@@ -1,11 +1,17 @@
-import socket 
+
+import socket
+import configparser
 import threading
 import os
 from urllib.parse import unquote
 
+config = configparser.RawConfigParser()
+cfg_path = 'no6/httpserver.conf'
+config.read(cfg_path)
+
 HEADER = 64
-PORT = 8000
-SERVER = '127.0.0.1'
+PORT = int(config.get('server-config', 'port'))
+SERVER = config.get('server-config', 'server')
 ADDR = (SERVER, PORT)
 FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!DISCONNECT"
@@ -21,6 +27,13 @@ def listFiles():
     for idx, f in enumerate(files):
         message += f"<li><h5><a href='/{f}'>{f}</a></h3></li>\n"
     return message
+
+def getContentType(extension):
+  with open('no6/ext2mime.txt') as topo_file:
+    for line in topo_file:
+        ext = line.split(' ')[0]
+        if extension == ext:
+            return line.split(' ')[1]
 
 def handle_client(conn, addr):
     print(f"[NEW CONNECTION] {addr} connected.")
@@ -87,14 +100,8 @@ def handle_client(conn, addr):
           print("filename : ", filename)
           extension = request_file.split('.')[1]
           extension = '.' + extension
-          content_type = ''
           print("extension : ", extension)
-          with open('no6/ext2mime.txt') as topo_file:
-              for line in topo_file:
-                  ext = line.split(' ')[0]
-                  if extension == ext:
-                      content_type = line.split(' ')[1]
-                      break
+          content_type = getContentType(extension)
                   # print(line)  # The comma to suppress the extra new line char
 
           content_length = len(response_data)
