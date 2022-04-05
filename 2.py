@@ -1,4 +1,5 @@
 import socket, ssl
+import re
 
 HOST = 'google.com'
 context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
@@ -18,4 +19,9 @@ while True:
     response += received.decode('utf-8')
 
 response_header = response.split('\r\n\r\n')[0]
-print(f'{response_header}')
+number_2 = re.match(r"([\s\S]* Content-Encoding=)(.*)", response_header)
+if number_2:
+    number_2 = number_2.group(2).strip()
+    print("Content-Encoding : ", number_2)
+else:
+    print('Content-Encoding tidak ditemukan.')
